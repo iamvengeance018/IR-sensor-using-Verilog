@@ -1,0 +1,76 @@
+module embedded(
+    input wire clk,
+    input wire rst,
+    input wire l_sensor,
+    input wire r_sensor,
+    output reg l_led,
+    output reg r_led,
+    output reg l_buzz,
+    output reg r_buzz
+    );
+   
+    reg [15:0] l_debounce_count;
+    reg [15:0] r_debounce_count;
+    reg l_detected;
+    reg r_detected;
+    
+    initial begin
+    l_debounce_count=0;
+    r_debounce_count=0;
+    l_detected=0;
+    r_detected=0;
+    l_led=0;
+    r_led=0;
+    l_buzz=0;
+    r_buzz=0;
+    end
+    
+    always@(posedge clk or posedge rst) begin
+        if(rst) begin
+            l_debounce_count<=0;
+            r_debounce_count<=0;
+            l_detected<=0;
+            r_detected<=0;
+            l_led<=0;
+            r_led<=0;
+            l_buzz<=0;
+            r_buzz<=0;
+           end else begin
+            if(l_sensor) begin
+                l_debounce_count<=l_debounce_count+1;
+                if(l_debounce_count > 50000) begin
+                    l_detected<=1;
+                end
+            end else begin
+                l_debounce_count<=0;
+                l_detected<=0;
+            end 
+            
+            if(r_sensor) begin
+                r_debounce_count<=r_debounce_count+1;
+                if(r_debounce_count > 50000) begin
+                    r_detected<=1;
+                end
+            end else begin
+                r_debounce_count<=0;
+                r_detected<=0;
+            end
+            
+            if(l_detected) begin
+                l_led=1;
+                l_buzz=1;
+            end else begin
+                l_led=0;
+                l_buzz=0;
+            end
+            
+            if(r_detected) begin
+                r_led=1;
+                r_buzz=1;
+            end else begin
+                r_led=0;
+                r_buzz=0;
+            end 
+        end  
+    end 
+endmodule
